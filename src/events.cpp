@@ -7,8 +7,6 @@ constexpr auto apprentice {RE::LOCK_LEVEL::kEasy};
 constexpr auto adept {RE::LOCK_LEVEL::kAverage};
 constexpr auto expert {RE::LOCK_LEVEL::kHard};
 constexpr auto master {RE::LOCK_LEVEL::kVeryHard};
-constexpr auto requireskey {RE::LOCK_LEVEL::kRequiresKey};
-
 
 namespace Events 
 {  
@@ -21,36 +19,34 @@ namespace Events
 
                 const auto player = RE::PlayerCharacter::GetSingleton();
                 
-                // players lockpicking skill
                 const float lockpickingskill = player->AsActorValueOwner()->GetActorValue(RE::ActorValue::kLockpicking);
 
-                // skill requirements for each lock level
+                // Skill requirements for each lock level
                 const float novice_skill = 0.0f;
                 const float apprentice_skill = 15.0f;
                 const float adept_skill = 30.0f;
                 const float expert_skill = 45.0f;
                 const float master_skill = 65.0f;
 
-                // gets the current crosshair target so i can get the locks level.
-                // also checks if the target is null to prevent assertion errors from spam activating while looking away from a container.
+                // Gets the current crosshair target so i can get the locks level.
+                // It also checks if the target is null to prevent assertion errors from spam activating while looking away from a container
+                // and hides the menu to prevent the player from bypassing requirements by quickly looking away and spamming activate.
                 auto crosshairtarget = RE::CrosshairPickData::GetSingleton();
                 if (!crosshairtarget || !crosshairtarget->target) {
                     logger::error("Crosshair target is Null, stopping handler to prevent crash. Stop spamming the damn thing!");
-                    RE::UIMessageQueue::GetSingleton()->AddMessage(RE::LockpickingMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr); // hides the menu to prevent the player from bypassing requirements by quickly looking away and spamming activate
+                    RE::UIMessageQueue::GetSingleton()->AddMessage(RE::LockpickingMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr); 
                     return RE::BSEventNotifyControl::kContinue;
                 }
 
                 const auto lockedref = crosshairtarget->target.get();
-                if (!lockedref) return RE::BSEventNotifyControl::kContinue; // second check just in case, first one should always work though
+                if (!lockedref) return RE::BSEventNotifyControl::kContinue; // Second check just in case, first one should always work though
 
-                // gets the lock level of the object being lockpicked.
                 const auto locklevel = static_cast<RE::LOCK_LEVEL>(lockedref->GetLockLevel());
 
                 logger::debug("Player is lockpicking {}", lockedref->GetName());
                 logger::debug("Lock Level is: {}", static_cast<int>(locklevel));
                 logger::debug("Player Lockpicking Skill is: {}", lockpickingskill);
                 
-                // what determines if the lockpicking menu shows up
                 bool canLockpick = false;
 
                 switch (locklevel) {
@@ -71,21 +67,20 @@ namespace Events
                         break;
                     default:
                         canLockpick = true; // If for some reason the lock level is something other than 0-4, it defaults to letting the lockpick menu appear.
-                                            // I have no clue why it would be something other than 0-4 but if so, it lets the player pick the lock.
-                }
+                }                           // I have no clue why it would or if it could be something other than 0-4 but if so, it lets the player pick the lock.
 
-                logger::debug("Can Lockpick: {}", canLockpick); // slightly uneccesary probably but whatever
+                logger::debug("Can Lockpick: {}", canLockpick);
                 
                 if (canLockpick) {
                     logger::info("Lockpicking successful!");
-                    return RE::BSEventNotifyControl::kContinue;
+                return RE::BSEventNotifyControl::kContinue;
                 } 
                 else {
                     logger::info("Lockpicking unsuccessful.");
                     RE::PlaySound("UILockpickingCylinderStop");
-                    RE::DebugNotification("You cannot lockpick this lock.");
+                    RE::DebugNotification("You cannot pick this lock.");
                     RE::UIMessageQueue::GetSingleton()->AddMessage(RE::LockpickingMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr);
-                    return RE::BSEventNotifyControl::kStop;
+                return RE::BSEventNotifyControl::kStop;
                 }
             }
         }

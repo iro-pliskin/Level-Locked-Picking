@@ -6,12 +6,6 @@ void OnMessage(SKSE:: MessagingInterface::Message* message) {
     if (message->type == SKSE::MessagingInterface::kDataLoaded) {
         logger::trace("Game data loaded");
         RE::ConsoleLog::GetSingleton()->Print("LLP -- Data loaded"); // REMOVE LATER
-        
-        // The below is lowkey useless since player lockpicking is always at 15 but i'll keep it for reference for now.
-
-        auto player = RE::PlayerCharacter::GetSingleton(); 
-        float playerlockpickingskill = player->AsActorValueOwner()->GetActorValue(RE::ActorValue::kLockpicking);
-        logger::info("Player Lockpicking Skill is {}", playerlockpickingskill); 
     }
 }
 
