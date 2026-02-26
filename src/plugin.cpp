@@ -1,11 +1,14 @@
 #include "PCH.h"
 #include "logging.h"
 #include "events.h"
+#include "settings.h"
 
 void OnMessage(SKSE:: MessagingInterface::Message* message) {
     if (message->type == SKSE::MessagingInterface::kDataLoaded) {
         logger::trace("Game data loaded");
         RE::ConsoleLog::GetSingleton()->Print("LLP -- Data loaded"); // REMOVE LATER
+        Settings::LoadSettings();
+        Events::Register();
     }
 }
 
@@ -25,8 +28,6 @@ SKSEPluginLoad(const SKSE::LoadInterface *skse)
     SKSE::GetMessagingInterface()->RegisterListener(OnMessage);
 
     logger::info("{} has finished loading.", name);
-
-    Events::Register(); 
 
     return true;
 }

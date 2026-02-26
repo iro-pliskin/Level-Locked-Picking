@@ -1,6 +1,7 @@
 #include "PCH.h"
 #include "logging.h"
 #include "events.h"
+#include "settings.h"
 
 constexpr auto novice {RE::LOCK_LEVEL::kVeryEasy};
 constexpr auto apprentice {RE::LOCK_LEVEL::kEasy};
@@ -18,8 +19,12 @@ namespace Events
                 logger::info("Lockpicking Menu opened...");
 
                 const auto player = RE::PlayerCharacter::GetSingleton();
+
+                const float lockpicking = player->AsActorValueOwner()->GetActorValue(RE::ActorValue::kLockpicking);
+                const float security = player->AsActorValueOwner()->GetActorValue(RE::ActorValue::kPickpocket);
                 
-                const float lockpickingskill = player->AsActorValueOwner()->GetActorValue(RE::ActorValue::kLockpicking);
+                // If hand to hand is active, it uses the player's pickpocketing/security skill instead
+                const float lockpickingskill = Settings::h2h_present ? security : lockpicking;
 
                 // Skill requirements for each lock level
                 const float novice_skill = 0.0f;
@@ -30,7 +35,7 @@ namespace Events
 
                 // Gets the current crosshair target so i can get the locks level.
                 // It also checks if the target is null to prevent assertion errors from spam activating while looking away from a container
-                // and hides the menu to prevent the player from bypassing requirements by quickly looking away and spamming activate.
+                // and hides the menu to prevent the player from bypassing requirements by quickly looking away and spamming a bunch.
                 auto crosshairtarget = RE::CrosshairPickData::GetSingleton();
                 if (!crosshairtarget || !crosshairtarget->target) {
                     logger::error("Crosshair target is Null, stopping handler to prevent crash. Stop spamming the damn thing!");
@@ -67,20 +72,22 @@ namespace Events
                         break;
                     default:
                         canLockpick = true; // If for some reason the lock level is something other than 0-4, it defaults to letting the lockpick menu appear.
-                }                           // I have no clue why it would or if it could be something other than 0-4 but if so, it lets the player pick the lock.
-
+                        break;              // I have no clue why it would, or if it could be something other than 0-4 but if so, it lets the player pick the lock.
+                }
+                
                 logger::debug("Can Lockpick: {}", canLockpick);
+
                 
                 if (canLockpick) {
-                    logger::info("Lockpicking successful!");
-                return RE::BSEventNotifyControl::kContinue;
+                    logger::info("Lockpicking allowed.");
+                    return RE::BSEventNotifyControl::kContinue;
                 } 
                 else {
-                    logger::info("Lockpicking unsuccessful.");
+                    logger::info("Lockpicking blocked.");
                     RE::PlaySound("UILockpickingCylinderStop");
                     RE::DebugNotification("You cannot pick this lock.");
                     RE::UIMessageQueue::GetSingleton()->AddMessage(RE::LockpickingMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr);
-                return RE::BSEventNotifyControl::kStop;
+                    return RE::BSEventNotifyControl::kStop;
                 }
             }
         }

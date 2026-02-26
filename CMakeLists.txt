@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 # Set your project name. This will be the name of your SKSE .dll file.
-project(LevelLockedPicking VERSION 0.1.1 LANGUAGES CXX)
+project(LevelLockedPicking VERSION 0.2.0 LANGUAGES CXX)
 
 # #
 # YOU DO NOT NEED TO EDIT ANYTHING BELOW HERE
@@ -34,10 +34,12 @@ endif()
 # Setup your SKSE plugin as an SKSE plugin!
 find_package(CommonLibSSE CONFIG REQUIRED)
 add_commonlibsse_plugin(${PROJECT_NAME} SOURCES 
-    "src/plugin.cpp" 
-    "src/events.cpp"
+    "src/plugin.cpp"
     "src/logging.cpp"
+    "src/events.cpp"
+    "src/settings.cpp"
 ) 
+
 target_include_directories(${PROJECT_NAME} PRIVATE 
     "include"
     "src"
