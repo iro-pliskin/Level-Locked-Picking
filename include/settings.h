@@ -1,5 +1,4 @@
 #pragma once
-#include <RE/Skyrim.h>
 #include "logging.h"
 
 class Settings

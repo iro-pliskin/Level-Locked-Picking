@@ -1,4 +1,3 @@
-#include "PCH.h"
 #include "logging.h"
 #include "events.h"
 #include "settings.h"
@@ -24,7 +23,7 @@ namespace Events
                 const float security = player->AsActorValueOwner()->GetActorValue(RE::ActorValue::kPickpocket);
                 
                 // If hand to hand is active, it uses the player's pickpocketing/security skill instead
-                const float lockpickingskill = Settings::h2h_present ? security : lockpicking;
+                const float lockpicking_skill = Settings::h2h_present ? security : lockpicking;
 
                 // Skill requirements for each lock level
                 const float novice_skill = 0.0f;
@@ -50,25 +49,25 @@ namespace Events
 
                 logger::debug("Player is lockpicking {}", lockedref->GetName());
                 logger::debug("Lock Level is: {}", static_cast<int>(locklevel));
-                logger::debug("Player Lockpicking Skill is: {}", lockpickingskill);
+                logger::debug("Player Lockpicking Skill is: {}", lockpicking_skill);
                 
                 bool canLockpick = false;
 
                 switch (locklevel) {
                     case novice:
-                        canLockpick = lockpickingskill >= novice_skill;
+                        canLockpick = lockpicking_skill >= novice_skill;
                         break;
                     case apprentice:
-                        canLockpick = lockpickingskill >= apprentice_skill;
+                        canLockpick = lockpicking_skill >= apprentice_skill;
                         break;
                     case adept:
-                        canLockpick = lockpickingskill >= adept_skill;
+                        canLockpick = lockpicking_skill >= adept_skill;
                         break;
                     case expert:
-                        canLockpick = lockpickingskill >= expert_skill;
+                        canLockpick = lockpicking_skill >= expert_skill;
                         break;
                     case master:
-                        canLockpick = lockpickingskill >= master_skill;
+                        canLockpick = lockpicking_skill >= master_skill;
                         break;
                     default:
                         canLockpick = true; // If for some reason the lock level is something other than 0-4, it defaults to letting the lockpick menu appear.

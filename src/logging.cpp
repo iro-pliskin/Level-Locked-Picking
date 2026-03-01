@@ -1,6 +1,4 @@
-#include "PCH.h"
 #include "logging.h"
-#include <spdlog/sinks/basic_file_sink.h>
 
 void SetupLog() {
     auto logsFolder = SKSE::log::log_directory();

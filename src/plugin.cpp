@@ -1,4 +1,3 @@
-#include "PCH.h"
 #include "logging.h"
 #include "events.h"
 #include "settings.h"
