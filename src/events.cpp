@@ -25,49 +25,41 @@ namespace Events
                 // If hand to hand is active, it uses the player's pickpocketing/security skill instead
                 const float lockpicking_skill = Settings::h2h_present ? security : lockpicking;
 
-                // Skill requirements for each lock level
-                const float novice_skill = 0.0f;
-                const float apprentice_skill = 15.0f;
-                const float adept_skill = 30.0f;
-                const float expert_skill = 45.0f;
-                const float master_skill = 65.0f;
-
-                // Gets the current crosshair target so i can get the locks level.
-                // It also checks if the target is null to prevent assertion errors from spam activating while looking away from a container
-                // and hides the menu to prevent the player from bypassing requirements by quickly looking away and spamming a bunch.
-                auto crosshairtarget = RE::CrosshairPickData::GetSingleton();
-                if (!crosshairtarget || !crosshairtarget->target) {
+                // If the crosshair moves away from an object just as code fires, theres a chance that the crosshair target can be null, causing a crash.
+                // This checks if the target is null before getting the lock level, and exits the menu early to avoid a race condition.
+                auto crosshairTarget = RE::CrosshairPickData::GetSingleton();
+                if (!crosshairTarget || !crosshairTarget->target) {
                     logger::error("Crosshair target is Null, stopping handler to prevent crash. Stop spamming the damn thing!");
                     RE::UIMessageQueue::GetSingleton()->AddMessage(RE::LockpickingMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr); 
-                    return RE::BSEventNotifyControl::kContinue;
+                    return RE::BSEventNotifyControl::kStop;
                 }
 
-                const auto lockedref = crosshairtarget->target.get();
-                if (!lockedref) return RE::BSEventNotifyControl::kContinue; // Second check just in case, first one should always work though
+                const auto lockedref = crosshairTarget->target.get();
+                if (!lockedref) return RE::BSEventNotifyControl::kStop; // Second check just in case the first null check fails
 
-                const auto locklevel = static_cast<RE::LOCK_LEVEL>(lockedref->GetLockLevel());
+                const auto lock_level = static_cast<RE::LOCK_LEVEL>(lockedref->GetLockLevel());
 
                 logger::debug("Player is lockpicking {}", lockedref->GetName());
-                logger::debug("Lock Level is: {}", static_cast<int>(locklevel));
+                logger::debug("Lock Level is: {}", static_cast<int>(lock_level));
                 logger::debug("Player Lockpicking Skill is: {}", lockpicking_skill);
                 
                 bool canLockpick = false;
 
-                switch (locklevel) {
+                switch (lock_level) {
                     case novice:
-                        canLockpick = lockpicking_skill >= novice_skill;
+                        canLockpick = lockpicking_skill >= Settings::novice_skill;
                         break;
                     case apprentice:
-                        canLockpick = lockpicking_skill >= apprentice_skill;
+                        canLockpick = lockpicking_skill >= Settings::apprentice_skill;
                         break;
                     case adept:
-                        canLockpick = lockpicking_skill >= adept_skill;
+                        canLockpick = lockpicking_skill >= Settings::adept_skill;
                         break;
                     case expert:
-                        canLockpick = lockpicking_skill >= expert_skill;
+                        canLockpick = lockpicking_skill >= Settings::expert_skill;
                         break;
                     case master:
-                        canLockpick = lockpicking_skill >= master_skill;
+                        canLockpick = lockpicking_skill >= Settings::master_skill;
                         break;
                     default:
                         canLockpick = true; // If for some reason the lock level is something other than 0-4, it defaults to letting the lockpick menu appear.
@@ -75,16 +67,15 @@ namespace Events
                 }
                 
                 logger::debug("Can Lockpick: {}", canLockpick);
-
                 
                 if (canLockpick) {
-                    logger::info("Lockpicking allowed.");
+                    logger::info("Lockpicking skill check succeeded");
                     return RE::BSEventNotifyControl::kContinue;
                 } 
                 else {
-                    logger::info("Lockpicking blocked.");
+                    logger::info("Lockpicking skill check failed");
                     RE::PlaySound("UILockpickingCylinderStop");
-                    RE::DebugNotification("You cannot pick this lock.");
+                    RE::DebugNotification("You lack the skill requirement needed to pick this lock.");
                     RE::UIMessageQueue::GetSingleton()->AddMessage(RE::LockpickingMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr);
                     return RE::BSEventNotifyControl::kStop;
                 }

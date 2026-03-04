@@ -4,10 +4,10 @@
 
 void OnMessage(SKSE:: MessagingInterface::Message* message) {
     if (message->type == SKSE::MessagingInterface::kDataLoaded) {
-        logger::trace("Game data loaded");
-        RE::ConsoleLog::GetSingleton()->Print("LLP -- Data loaded"); // REMOVE LATER
         Settings::LoadSettings();
         Events::Register();
+        logger::trace("Game data loaded");
+        RE::ConsoleLog::GetSingleton()->Print("LLP - Data loaded"); // REMOVE LATER
     }
 }
 
