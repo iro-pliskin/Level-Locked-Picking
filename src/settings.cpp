@@ -18,7 +18,7 @@ void Settings::LoadSettings()
        logger::warn("INI file not found in {}, using default values", iniPath);
     }
     
-    debug_logging = ini.GetBoolValue("Logging", "DebugLogging");
+    debug_logging = ini.GetBoolValue("Logging", "bDebugLogging");
 
     novice_skill = ini.GetLongValue("SkillRequirements", "iNoviceLockRequirement", novice_skill);
     apprentice_skill = ini.GetLongValue("SkillRequirements", "iApprenticeLockRequirement",apprentice_skill);
