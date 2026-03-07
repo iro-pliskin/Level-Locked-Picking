@@ -15,7 +15,7 @@ namespace Events
         if (a_event && a_event->menuName == RE::LockpickingMenu::MENU_NAME && a_event->opening) 
         {
             {
-                logger::info("Lockpicking Menu opened...");
+                logger::debug("Lockpicking Menu opened...");
 
                 const auto player = RE::PlayerCharacter::GetSingleton();
 
@@ -65,15 +65,14 @@ namespace Events
                         canLockpick = true; // If for some reason the lock level is something other than 0-4, it defaults to letting the lockpick menu appear.
                         break;              // I have no clue why it would, or if it could be something other than 0-4 but if so, it lets the player pick the lock.
                 }
-                
+
                 logger::debug("Can Lockpick: {}", canLockpick);
                 
                 if (canLockpick) {
-                    logger::info("Lockpicking skill check succeeded");
+                    logger::debug("Lockpicking skill check succeeded");
                     return RE::BSEventNotifyControl::kContinue;
-                } 
-                else {
-                    logger::info("Lockpicking skill check failed");
+                } else {
+                    logger::debug("Lockpicking skill check failed");
                     RE::PlaySound("UILockpickingCylinderStop");
                     RE::DebugNotification("You lack the skill requirement needed to pick this lock.");
                     RE::UIMessageQueue::GetSingleton()->AddMessage(RE::LockpickingMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kHide, nullptr);
@@ -93,3 +92,5 @@ namespace Events
         }
     }
 }
+
+
