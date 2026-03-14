@@ -8,10 +8,9 @@ void Settings::LoadSettings()
     CSimpleIniA ini;
     ini.SetUnicode();
 
-    constexpr auto iniPath = R"(.\Data\SKSE\Plugins\LevelLockedPicking.ini)";
+    constexpr auto iniPath = "Data/SKSE/Plugins/LevelLockedPicking.ini";
 
-    SI_Error rc = ini.LoadFile(iniPath);
-    ini.LoadFile(iniPath);
+    SI_Error rc = ini.LoadFile(iniPath);;
 
     // If the ini file isn't found, it just uses the hardcoded values in settings.h
     if (rc < 0) {
