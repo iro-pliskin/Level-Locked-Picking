@@ -3,7 +3,14 @@
 cmake_minimum_required(VERSION 3.21)
 
 # Set your project name. This will be the name of your SKSE .dll file.
-project(LevelLockedPicking VERSION 0.3.0 LANGUAGES CXX)
+project(LevelLockedPicking VERSION 0.3.1 LANGUAGES CXX)
+
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in
+	${CMAKE_CURRENT_BINARY_DIR}/version.rc
+	@ONLY
+)
+
 
 # #
 # YOU DO NOT NEED TO EDIT ANYTHING BELOW HERE
@@ -38,6 +45,7 @@ add_commonlibsse_plugin(${PROJECT_NAME} SOURCES
     "src/logging.cpp"
     "src/events.cpp"
     "src/settings.cpp"
+    ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 ) 
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
