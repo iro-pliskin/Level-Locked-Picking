@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 # Set your project name. This will be the name of your SKSE .dll file.
-project(LevelLockedPicking VERSION 0.3.1 LANGUAGES CXX)
+project(LevelLockedPicking VERSION 0.3.2 LANGUAGES CXX)
 
 configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in
