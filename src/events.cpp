@@ -38,31 +38,22 @@ namespace Events
 
             const auto lock_level = static_cast<RE::LOCK_LEVEL>(lockedref->GetLockLevel());
 
-            logger::debug("Lock Target: {} | Lock Level: {} | Player Skill: {}", lockedref->GetName(), static_cast<int>(lock_level), lockpicking_skill);
-            
+            int skillReq = 0;
             bool canLockpick = false;
 
             switch (lock_level) {
-                case novice:
-                    canLockpick = lockpicking_skill >= Settings::novice_skill;
-                    break;
-                case apprentice:
-                    canLockpick = lockpicking_skill >= Settings::apprentice_skill;
-                    break;
-                case adept:
-                    canLockpick = lockpicking_skill >= Settings::adept_skill;
-                    break;
-                case expert:
-                    canLockpick = lockpicking_skill >= Settings::expert_skill;
-                    break;
-                case master:
-                    canLockpick = lockpicking_skill >= Settings::master_skill;
-                    break;
-                // If for some reason the lock level is something other than 0-4, it defaults to letting the lockpicking menu appear.
-                default:
-                    canLockpick = true;
-                    break;
+                case novice:        skillReq = Settings::novice_skill; break;
+                case apprentice:    skillReq = Settings::apprentice_skill; break;
+                case adept:         skillReq = Settings::adept_skill; break;
+                case expert:        skillReq = Settings::expert_skill; break;
+                case master:        skillReq = Settings::master_skill; break;
+                // If for some reason the lock level is something other than 0-4, it defaults to setting the skill requirement to 0.
+                default: skillReq = 0; break;
             }
+
+            canLockpick = lockpicking_skill >= skillReq;
+
+            logger::debug("Target: {} | Lock Level: {} | Skill Req: {} | Player Skill: {}", lockedref->GetName(), static_cast<int>(lock_level), skillReq, lockpicking_skill);
 
             logger::debug("Can Lockpick: {} | Lockpicking skill check {}", canLockpick, canLockpick ? "succeeded" : "failed");
 
